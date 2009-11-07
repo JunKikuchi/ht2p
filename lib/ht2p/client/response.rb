@@ -6,7 +6,11 @@ class HT2P::Client::Response
   end
 
   def receive(&block)
-    block.call(self) if block_given?
+    if block_given?
+      block.call(self)
+    else
+      @client.read
+    end
   end
 
   def read(length)
