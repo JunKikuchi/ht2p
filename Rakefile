@@ -5,8 +5,8 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "ht2p"
-    gem.summary = %Q{TODO: one-line summary of your gem}
-    gem.description = %Q{TODO: longer description of your gem}
+    gem.summary = %Q{ht2p}
+    gem.description = %Q{ht2p}
     gem.email = "kikuchi@bonnou.com"
     gem.homepage = "http://github.com/JunKikuchi/ht2p"
     gem.authors = ["Jun Kikuchi"]
