@@ -1,6 +1,31 @@
-= ht2p
+= HT2P
 
-Description goes here.
+HT2P is a Ruby library for HTTP.
+
+== Usage
+
+  require 'rubygems'
+  require 'ht2p'
+  
+  HT2P::Client.new('http://localhost:4567/echo/content') do |request|
+    p request.uri
+    request.method = :put
+    request.header['Accepts'] = 'text/html'
+    request.header['Content-Length'] = ("Hello World!\n" * 1000).size
+    response = request.send do |io|
+      1000.times do
+        io.write 'Hello World!'
+      end
+    end
+      
+    p response.code
+    p response.header
+    response.receive do |io|
+      while chunk = io.read(1024)
+        print chunk
+      end
+    end
+  end
 
 == Note on Patches/Pull Requests
  
