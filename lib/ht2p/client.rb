@@ -1,6 +1,7 @@
 require 'uri'
 require 'resolv'
 require 'socket'
+require 'openssl'
 
 class HT2P::Client
   attr_reader :uri
@@ -8,22 +9,28 @@ class HT2P::Client
   def initialize(uri, params={}, &block)
     @uri = URI.parse(uri)
 
-    TCPSocket.open(
-      Resolv.getaddresses(@uri.host).collect do |val|
-        if md = /[\d\.]+/.match(val)
-          md[1]
+    ip = IPSocket.getaddress(@uri.host)
+    ip = nil if /\A127\.|\A::1\z/ =~ ip
+
+    TCPSocket.open(ip, @uri.port) do |socket|
+      if @uri.scheme == 'https'
+        begin
+          @socket = OpenSSL::SSL::SSLSocket.new(socket)
+          @socket.connect
+          block.call Request.new(self, params)
+        ensure
+          @socket.close
         end
-      end.shift,
-      @uri.port
-    ) do |s|
-      @socket = s
-      block.call Request.new(self, params)
-      @socket = nil
+      else
+        @socket = socket
+        block.call Request.new(self, params)
+      end
     end
   end
 
   def request_header(method, header)
     @socket.write "#{method.to_s.upcase} #{@uri.path} HTTP/1.1\r\n"
+    @socket.write "Host: #{@uri.host}\r\n"
     header.each do |key, val|
       if val.is_a? Array
         val.each do |v|
@@ -67,8 +74,12 @@ class HT2P::Client
     @socket.write val
   end
 
-  def read(length)
+  def read(length=nil)
     @socket.read length
+  end
+
+  def gets
+    @socket.gets
   end
 
   def flush
