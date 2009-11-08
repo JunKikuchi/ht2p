@@ -29,13 +29,13 @@ class HT2P::Client::Response
     end
 
     def read(length=nil)
-      if @size > 0
+      if @size.nil?
+        @client.read(length)
+      elsif @size > 0
         length ||= @size
         length = @size if @size < length
         @size -= length
 
-        @client.read(length)
-      elsif @size.nil?
         @client.read(length)
       else
         nil
