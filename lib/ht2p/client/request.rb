@@ -6,7 +6,7 @@ class HT2P::Client::Request
   def initialize(client, params)
     @client = client
     @method = params[:method] || :get
-    @header = params[:header] || {}
+    @header = HT2P::Header.new.merge!(params[:header] || {})
   end
 
   def send(body=nil, &block)
