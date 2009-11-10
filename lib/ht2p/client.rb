@@ -1,5 +1,4 @@
 require 'uri'
-require 'resolv'
 require 'socket'
 require 'openssl'
 

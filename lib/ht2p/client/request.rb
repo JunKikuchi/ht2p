@@ -1,5 +1,5 @@
 class HT2P::Client::Request
-  METHODS = %w'get head post put delete options trace connect patch link unlink'
+  METHODS = %w'get head post put delete options trace connect'
 
   attr_accessor :uri, :method, :header
 
