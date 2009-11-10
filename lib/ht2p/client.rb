@@ -3,7 +3,7 @@ require 'socket'
 require 'openssl'
 
 class HT2P::Client
-  attr_reader :uri
+  attr_reader :uri, :request
 
   def initialize(uri, params={}, &block)
     @uri = URI.parse(uri)
@@ -16,13 +16,15 @@ class HT2P::Client
         begin
           @socket = OpenSSL::SSL::SSLSocket.new(socket)
           @socket.connect
-          block.call HT2P::Client::Request.new(self, params)
+          @request = HT2P::Client::Request.new(self, params)
+          block.call @request
         ensure
           @socket.close
         end
       else
         @socket = socket
-        block.call HT2P::Client::Request.new(self, params)
+        @request = HT2P::Client::Request.new(self, params)
+        block.call @request
       end
     end
   end
