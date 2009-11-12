@@ -41,24 +41,7 @@ class HT2P::Client
   end
 
   def response_header
-    code = nil
-    header = HT2P::Header.new
-
-    key = nil
-    while line = @socket.gets.chop!
-      line.empty? && break
-
-      if md = %r!HTTP[\w\./]+\s+(\d+)!.match(line)
-        code = md[1]
-      elsif md = /(.+?):\s*(.*)/.match(line)
-        key, val = md[1].downcase, md[2]
-        header[key] = val
-      elsif md = /\s+(.*)/.match(line)
-        header[key] = md[1]
-      end
-    end
-
-    [code.to_i, header]
+    HT2P::Header.parse @socket
   end
 
   def write(val)
