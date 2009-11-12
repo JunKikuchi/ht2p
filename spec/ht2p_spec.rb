@@ -66,7 +66,7 @@ describe HT2P::Header do
     @header['a'].should == ['A', 'A']
   end
 
-  it 'should perform a `append` to append the value' do
+  it 'should perform `append` to append the value' do
     @header['a'] = 'A'
     @header.append('a', 'A')
     @header['a'].should == 'AA'
@@ -77,12 +77,55 @@ describe HT2P::Header do
     @header['b'].should == ['B', 'BB']
   end
 
-  it 'should perform a `<<` to parse HTTP header and store it' do
-    code, header = HT2P::Header.parse(StringIO.new(HEADER))
+  it 'should perform `load` to load HTTP header' do
+    code, header = HT2P::Header.load(StringIO.new(HEADER))
     code.should == 200
     header['a'].should == 'A'
     header['b'].should == ['B', 'B']
     header['c'].should == 'CC'
     header['d'].should == ['D', 'DD']
+  end
+
+  it 'should perform `format` to return header string' do
+    uri = URI.parse('http://example.com/')
+    s =<<END
+GET / HTTP/1.1
+Host: example.com
+
+END
+    @header.format(:get, uri).should == s.gsub("\n", "\r\n")
+
+    @header['a'] = 'A'
+    uri = URI.parse('http://example.com/')
+    s =<<END
+GET / HTTP/1.1
+Host: example.com
+a: A
+
+END
+    @header.format(:get, uri).should == s.gsub("\n", "\r\n")
+
+    @header['b'] = 'B'
+    uri = URI.parse('http://example.com/')
+    s =<<END
+GET / HTTP/1.1
+Host: example.com
+a: A
+b: B
+
+END
+    @header.format(:get, uri).should == s.gsub("\n", "\r\n")
+
+    @header['b'] = 'BB'
+    uri = URI.parse('http://example.com/')
+    s =<<END
+GET / HTTP/1.1
+Host: example.com
+a: A
+b: B
+b: BB
+
+END
+    @header.format(:get, uri).should == s.gsub("\n", "\r\n")
   end
 end

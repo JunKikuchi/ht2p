@@ -1,5 +1,5 @@
 class HT2P::Header < Hash
-  def self.parse(io)
+  def self.load(io)
     code = nil
     header = self.new
 
@@ -9,7 +9,7 @@ class HT2P::Header < Hash
       line.empty? && break
 
       if md = %r!HTTP[\w\./]+\s+(\d+)!.match(line)
-        code = md[1]
+        code = md[1].to_i
       elsif md = /(.+?):\s*(.*)/.match(line)
         key, val = md[1].downcase, md[2]
         header[key] = val
@@ -18,7 +18,7 @@ class HT2P::Header < Hash
       end
     end
 
-    [code.to_i, header]
+    [code, header]
   end
 
   def []=(key, val)
@@ -53,5 +53,13 @@ class HT2P::Header < Hash
 
       ret
     end
+  end
+
+  def format(method, uri)
+    "%s %s%s HTTP/1.1\r\n" % [
+      method.to_s.upcase,
+      uri.path,
+      uri.query && "?#{uri.query}"
+    ] << "Host: #{uri.host}\r\n" << to_s << "\r\n"
   end
 end

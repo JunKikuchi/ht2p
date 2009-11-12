@@ -30,18 +30,11 @@ class HT2P::Client
   end
 
   def request_header(method, header)
-    @socket.write "%s %s%s HTTP/1.1\r\n" % [
-      method.to_s.upcase,
-      @uri.path,
-      @uri.query && "?#{@uri.query}"
-    ]
-    @socket.write "Host: #{@uri.host}\r\n"
-    @socket.write header.to_s
-    @socket.write "\r\n"
+    @socket.write header.format(method, @uri)
   end
 
   def response_header
-    HT2P::Header.parse @socket
+    HT2P::Header.load @socket
   end
 
   def write(val)
