@@ -1,6 +1,6 @@
 = HT2P
 
-HT2P is a Ruby library for HTTP.
+HT2P is a Ruby library for HTTP and HTTPS.
 
 == Usage
 
