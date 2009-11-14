@@ -35,19 +35,6 @@ describe HT2P::Client do
   end
 end
 
-HEADER=<<END
-HTTP/1.1 100 continue
-HTTP/1.1 200 ok
-a:A
-b:B
-b: B
-c:  C
- C
-d: D
-d: D
- D
-END
-
 require 'stringio'
 
 describe HT2P::Header do
@@ -78,7 +65,19 @@ describe HT2P::Header do
   end
 
   it 'should perform `load` to load HTTP header' do
-    code, header = HT2P::Header.load(StringIO.new(HEADER))
+    s =<<END
+HTTP/1.1 100 continue
+HTTP/1.1 200 ok
+a:A
+b:B
+b: B
+c:  C
+ C
+d: D
+d: D
+ D
+END
+    code, header = HT2P::Header.load(StringIO.new(s))
     code.should == 200
     header['a'].should == 'A'
     header['b'].should == ['B', 'B']
