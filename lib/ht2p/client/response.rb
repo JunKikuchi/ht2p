@@ -6,7 +6,7 @@ class HT2P::Client::Response
   def initialize(client)
     @client, @code, @header = client, *client.response_header
 
-    @body = if HAS_BODY.include? @client.request.method.downcase.to_sym
+    @body = if HAS_BODY.include? @client.request.method.to_s.downcase.to_sym
       if @header['transfer-encoding'].to_s.downcase == 'chunked'
         Chunked.new(@client)
       else
