@@ -11,7 +11,8 @@ class HT2P::Client::Request
 
   def send(body=nil, &block)
     @client.request_header(@method, @header)
-    @client.write(body)  if body
+    @header['content-length'] = body.to_s.size
+    @client.write(body) if body
     block.call(self) if block_given?
     @client.flush
     HT2P::Client::Response.new(@client)
