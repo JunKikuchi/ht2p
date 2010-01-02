@@ -12,24 +12,28 @@ class HT2P::Header < Hash
         code = md[1].to_i
       elsif md = /(.+?):\s*(.*)/.match(line)
         key, val = md[1].downcase, md[2]
-        header[key] = val
+        if header.key? key
+          header.add key, val
+        else
+          header[key] = val
+        end
       elsif md = /\s+(.*)/.match(line)
-        header.append(key, md[1])
+        header.append key, md[1]
       end
     end
 
     [code, header]
   end
 
-  def []=(key, val)
-    if self.key? key
+  def add(key, val)
+    if key? key
       if self[key].is_a? Array
         self[key] << val
       else
-        super(key, [self[key], val])
+        self[key] = [self[key], val]
       end
     else
-      super(key, val)
+      self[key] = [val]
     end
   end
 
