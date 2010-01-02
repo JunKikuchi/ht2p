@@ -56,13 +56,14 @@ class HT2P::Client::Response
     end
 
     def read(length=nil)
-      parse_size unless @size > 0
+      parse_size if @size <= 0
       super length
     end
 
     def parse_size
       @size = @client.gets.chop!.hex
     end
+    private :parse_size
   end
 
   class Empty
