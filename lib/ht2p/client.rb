@@ -1,8 +1,12 @@
 require 'uri'
 require 'socket'
 require 'openssl'
+require 'forwardable'
 
 class HT2P::Client
+  extend Forwardable
+  def_delegators :@socket, :write, :read, :gets, :flush
+
   attr_reader :uri, :request
 
   def initialize(uri, params={}, &block)
@@ -27,30 +31,6 @@ class HT2P::Client
         block.call @request
       end
     end
-  end
-
-  def request_header(method, header)
-    @socket.write header.format(method, @uri)
-  end
-
-  def response_header
-    HT2P::Header.load @socket
-  end
-
-  def write(val)
-    @socket.write val.to_s
-  end
-
-  def read(length=nil)
-    @socket.read length
-  end
-
-  def gets
-    @socket.gets
-  end
-
-  def flush
-    @socket.flush
   end
 
   autoload :Request, 'ht2p/client/request'

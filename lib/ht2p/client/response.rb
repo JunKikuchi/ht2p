@@ -4,13 +4,13 @@ class HT2P::Client::Response
   HAS_BODY = [:get, :post, :put, :delete, :trace]
 
   def initialize(client)
-    @client, @code, @header = client, *client.response_header
+    @client, @code, @header = client, *HT2P::Header.load(client)
 
     @body = if HAS_BODY.include? @client.request.method.to_s.downcase.to_sym
       if @header['transfer-encoding'].to_s.downcase == 'chunked'
-        Chunked.new(@client)
+        Chunked.new @client
       else
-        Transfer.new(@client, @header['content-length'].to_i)
+        Transfer.new @client, @header['content-length'].to_i
       end
     else
       Empty.new
@@ -19,14 +19,14 @@ class HT2P::Client::Response
 
   def receive(&block)
     if block_given?
-      block.call(self)
+      block.call self
     else
       read
     end
   end
 
   def read(length=nil)
-    @body.read(length)
+    @body.read length
   end
 
   class Transfer
@@ -36,13 +36,13 @@ class HT2P::Client::Response
 
     def read(length=nil)
       if @size.nil?
-        @client.read(length)
+        @client.read length
       elsif @size > 0
         length ||= @size
         length = @size if @size < length
         @size -= length
 
-        @client.read(length)
+        @client.read length
       else
         nil
       end
@@ -51,13 +51,13 @@ class HT2P::Client::Response
 
   class Chunked < Transfer
     def initialize(client)
-      super(client, nil)
+      super client, nil
       parse_size
     end
 
     def read(length=nil)
       parse_size unless @size > 0
-      super(length)
+      super length
     end
 
     def parse_size

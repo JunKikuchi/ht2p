@@ -1,5 +1,6 @@
 class HT2P::Client::Request
-  METHODS = %w'get head post put delete options trace connect'
+  extend Forwardable
+  def_delegators :@client, :write
 
   attr_accessor :uri, :method, :header
 
@@ -11,18 +12,15 @@ class HT2P::Client::Request
 
   def send(body=nil, &block)
     @header['content-length'] = body.to_s.size if body
-    @client.request_header(@method, @header)
-    @client.write(body) if body
-    block.call(self) if block_given?
+    @client.write @header.format(@method, @client.uri)
+    @client.write body if body
+    block.call self if block_given?
     @client.flush
-    HT2P::Client::Response.new(@client)
+    HT2P::Client::Response.new @client
   end
 
+  METHODS = %w'get head post put delete options trace connect'
   METHODS.each do |val|
-    define_method(val, instance_method(:send))
-  end
-
-  def write(val)
-    @client.write(val)
+    define_method val, instance_method(:send)
   end
 end
