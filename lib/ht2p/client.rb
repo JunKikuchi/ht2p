@@ -17,8 +17,16 @@ class HT2P::Client
 
     TCPSocket.open(ip, @uri.port) do |socket|
       if @uri.scheme == 'https'
+        context = OpenSSL::SSL::SSLContext.new
+        context.ca_file = params[:ca_file]
+        context.ca_path = params[:ca_path] || OpenSSL::X509::DEFAULT_CERT_DIR
+        context.timeout = params[:timeout]
+        context.verify_depth = params[:verify_depth]
+        context.verify_mode  = OpenSSL::SSL.const_get\
+          "VERIFY_#{(params[:verify_mode] || 'PEER').to_s.upcase}"
+
         begin
-          @socket = OpenSSL::SSL::SSLSocket.new(socket)
+          @socket = OpenSSL::SSL::SSLSocket.new(socket, context)
           @socket.connect
           @request = HT2P::Client::Request.new(self, params)
           block.call @request
