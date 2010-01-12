@@ -1,8 +1,9 @@
 class HT2P::Client::Request
   extend Forwardable
-  def_delegators :@client, :write
+  def_delegators :@client, :uri, :write
+  def_delegators :@header, :[], :[]=
 
-  attr_accessor :uri, :method, :header
+  attr_accessor :method, :header
 
   alias :headers :header
 

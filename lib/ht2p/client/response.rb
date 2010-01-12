@@ -1,4 +1,7 @@
 class HT2P::Client::Response
+  extend Forwardable
+  def_delegators :@header, :[], :[]=
+
   attr_reader :code, :header
 
   alias :headers :header
