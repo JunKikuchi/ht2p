@@ -1,6 +1,8 @@
 class HT2P::Client::Response
   attr_reader :code, :header
 
+  alias :headers :header
+
   HAS_BODY = [:get, :post, :put, :delete, :trace]
 
   def initialize(client)

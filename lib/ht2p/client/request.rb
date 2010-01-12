@@ -4,6 +4,8 @@ class HT2P::Client::Request
 
   attr_accessor :uri, :method, :header
 
+  alias :headers :header
+
   def initialize(client, params)
     @client = client
     @method = params[:method] || :get
