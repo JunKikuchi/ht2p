@@ -10,7 +10,7 @@ begin
     gem.email = "kikuchi@bonnou.com"
     gem.homepage = "http://github.com/JunKikuchi/ht2p"
     gem.authors = ["Jun Kikuchi"]
-    gem.add_development_dependency "rspec", ">= 1.2.9"
+    gem.add_development_dependency "rspec"
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
   Jeweler::GemcutterTasks.new
